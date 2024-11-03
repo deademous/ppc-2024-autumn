@@ -15,8 +15,7 @@ TEST(opolin_d_max_of_matrix_elements_seq, Test_Max_Matrix_100x100) {
   const int count_cols = 100;
   int ref = INT_MAX;
   std::vector<int> out(1, INT_MIN);
-  std::vector<std::vector<int>> in =
-      opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
+  std::vector<std::vector<int>> in = opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
   int i_c = gen() % count_cols;
   int i_r = gen() % count_rows;
   in[i_r][i_c] = ref;
@@ -46,8 +45,7 @@ TEST(opolin_d_max_of_matrix_elements_seq, Test_Max_Matrix_100x1) {
   int ref = INT_MAX;
 
   std::vector<int> out(1, INT_MIN);
-  std::vector<std::vector<int>> in =
-      opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
+  std::vector<std::vector<int>> in = opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
   int i_r = gen() % count_rows;
   in[i_r][0] = ref;
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
@@ -76,8 +74,7 @@ TEST(opolin_d_max_of_matrix_elements_seq, Test_Max_Matrix_1x100) {
   int ref = INT_MAX;
 
   std::vector<int> out(1, INT_MIN);
-  std::vector<std::vector<int>> in =
-      opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
+  std::vector<std::vector<int>> in = opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
   int i_c = gen() % count_cols;
   in[0][i_c] = ref;
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
@@ -106,9 +103,7 @@ TEST(opolin_d_max_of_matrix_elements_seq, Test_Max_Matrix_1000x100) {
   int ref = INT_MAX;
 
   std::vector<int> out(1, INT_MIN);
-  std::vector<std::vector<int>> in =
-      opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
-  
+  std::vector<std::vector<int>> in = opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
   int i_c = gen() % count_cols;
   int i_r = gen() % count_rows;
   in[i_r][i_c] = ref;
