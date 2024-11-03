@@ -54,14 +54,13 @@ bool opolin_d_max_of_matrix_elements_mpi::TestMPITaskSequential::run() {
   for (unsigned int i = 0; i < input_.size(); i++) {
     int max_in_row = input_[i][0];
     for (unsigned int j = 1; j < input_[i].size(); j++) {
-      if (input_[i][j] > max_in_row)
-        max_in_row = input_[i][j];
+      if (input_[i][j] > max_in_row) max_in_row = input_[i][j];
     }
     rows_maxs[i] = max_in_row;
   }
   int max_in_local = rows_maxs[0];
-  for(unsigned int i = 1; i < rows_maxs.size(); i++){
-    if(rows_maxs[i] > max_in_local){
+  for (unsigned int i = 1; i < rows_maxs.size(); i++) {
+    if (rows_maxs[i] > max_in_local) {
       max_in_local = rows_maxs[i];
     }
   }
@@ -82,7 +81,7 @@ bool opolin_d_max_of_matrix_elements_mpi::TestMPITaskParallel::pre_processing() 
     delta = taskData->inputs_count[0] * taskData->inputs_count[1] / world.size();
   }
   broadcast(world, delta, 0);
-  
+
   if (world.rank() == 0) {
     // Init vectors
     unsigned int rows = taskData->inputs_count[0];
@@ -123,8 +122,7 @@ bool opolin_d_max_of_matrix_elements_mpi::TestMPITaskParallel::run() {
   internal_order_test();
   int max_in_vec = local_input_[0];
   for (unsigned int i = 1; i < local_input_.size(); i++) {
-    if (local_input_[i] > max_in_vec)
-     max_in_vec = local_input_[i];
+    if (local_input_[i] > max_in_vec) max_in_vec = local_input_[i];
   }
   reduce(world, max_in_vec, res_, boost::mpi::maximum<int>(), 0);
   return true;
