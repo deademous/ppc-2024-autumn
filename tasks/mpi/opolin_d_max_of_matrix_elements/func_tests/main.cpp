@@ -136,9 +136,9 @@ TEST(opolin_d_max_of_matrix_elements_mpi, Test_Max_Matrix_100x1) {
   }
 }
 
-TEST(opolin_d_max_of_matrix_elements_mpi, Test_Max_Matrix_1x1) {
-  const int count_rows = 1;
-  const int count_cols = 1;
+TEST(opolin_d_max_of_matrix_elements_mpi, Test_Max_Matrix_1000x100) {
+  const int count_rows = 1000;
+  const int count_cols = 100;
 
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_matrix;

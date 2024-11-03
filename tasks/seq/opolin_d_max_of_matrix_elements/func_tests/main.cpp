@@ -97,19 +97,21 @@ TEST(opolin_d_max_of_matrix_elements_seq, Test_Max_Matrix_1x100) {
   ASSERT_EQ(ref, out[0]);
 }
 
-TEST(opolin_d_max_of_matrix_elements_seq, Test_Max_Matrix_1x1) {
+TEST(opolin_d_max_of_matrix_elements_seq, Test_Max_Matrix_1000x100) {
   std::random_device dev;
   std::mt19937 gen(dev());
 
-  const int count_rows = 1;
-  const int count_cols = 1;
+  const int count_rows = 1000;
+  const int count_cols = 100;
   int ref = INT_MAX;
 
   std::vector<int> out(1, INT_MIN);
   std::vector<std::vector<int>> in =
       opolin_d_max_of_matrix_elements_seq::getRandomMatrix(count_rows, count_cols);
   
-  in[0][0] = ref;
+  int i_c = gen() % count_cols;
+  int i_r = gen() % count_rows;
+  in[i_r][i_c] = ref;
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
   for (unsigned int i = 0; i < in.size(); i++)
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in[i].data()));
