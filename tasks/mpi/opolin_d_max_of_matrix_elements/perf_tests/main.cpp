@@ -10,31 +10,32 @@
 
 TEST(opolin_d_max_of_matrix_elements_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  std::vector<std::vector<int>> global_matrix;
-  std::vector<int32_t> global_max(1, INT_MIN);
-  int ref = INT_MAX;
+  std::vector<std::vector<int>> matrix;
+  std::vector<int32_t> global_out(1, std::numeric_limits<int32_t>::min());
 
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
     std::random_device dev;
     std::mt19937 gen(dev());
+    int rows = 2000;
+    int cols = 2000;
+    int min = 0;
+    int max = 1000;
+    int res = std::numeric_limits<int32_t>::max();
 
-    int count_rows = 4000;
-    int count_cols = 4000;
+    matrix = getRandomMatrixForGetMaxInMatrix(rows, cols, min, max);
+    int rand_r = gen() % rows;
+    int rand_c = gen() % cols;
+    matrix[rand_r][rand_c] = res;
 
-    global_matrix = opolin_d_max_of_matrix_elements_mpi::getRandomMatrix(count_rows, count_cols);
-    int i_r = gen() % count_rows;
-    int i_c = gen() % count_cols;
-    global_matrix[i_r][i_c] = ref;
+    for (unsigned int i = 0; i < matrix.size(); i++)
+      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(matrix[i].data()));
+    taskDataPar->inputs_count.emplace_back(rows);
+    taskDataPar->inputs_count.emplace_back(cols);
 
-    for (unsigned int i = 0; i < global_matrix.size(); i++)
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix[i].data()));
-    taskDataPar->inputs_count.emplace_back(count_rows);
-    taskDataPar->inputs_count.emplace_back(count_cols);
-
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_max.data()));
-    taskDataPar->outputs_count.emplace_back(global_max.size());
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_out.data()));
+    taskDataPar->outputs_count.emplace_back(global_out.size());
   }
 
   auto testMpiTaskParallel = std::make_shared<opolin_d_max_of_matrix_elements_mpi::TestMPITaskParallel>(taskDataPar);
@@ -52,35 +53,36 @@ TEST(opolin_d_max_of_matrix_elements_mpi, test_pipeline_run) {
   perfAnalyzer->pipeline_run(perfAttr, perfResults);
   if (world.rank() == 0) {
     ppc::core::Perf::print_perf_statistic(perfResults);
-    ASSERT_EQ(ref, global_max[0]);
+    ASSERT_EQ(res, global_out[0]);
   }
 }
 
 TEST(opolin_d_max_of_matrix_elements_mpi, test_task_run) {
   boost::mpi::communicator world;
-  std::vector<std::vector<int>> global_matrix;
-  std::vector<int32_t> global_max(1, INT_MIN);
-  int ref = INT_MAX;
+  std::vector<std::vector<int>> matrix;
+  std::vector<int32_t> global_out(1, std::numeric_limits<int32_t>::min());
 
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     std::random_device dev;
     std::mt19937 gen(dev());
+    int rows = 2000;
+    int cols = 2000;
+    int min = 0;
+    int max = 1000;
+    int res = std::numeric_limits<int32_t>::max();
 
-    int count_rows = 2000;
-    int count_cols = 2000;
+    matrix = getRandomMatrixForGetMaxInMatrix(rows, cols, min, max);
+    int rand_c = gen() % cols;
+    int rand_r = gen() % rows;
+    matrix[rand_r][rand_c] = res;
+    for (unsigned int i = 0; i < matrix.size(); i++)
+      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(matrix[i].data()));
+    taskDataPar->inputs_count.emplace_back(rows);
+    taskDataPar->inputs_count.emplace_back(cols);
 
-    global_matrix = opolin_d_max_of_matrix_elements_mpi::getRandomMatrix(count_rows, count_cols);
-    int i_c = gen() % count_cols;
-    int i_r = gen() % count_rows;
-    global_matrix[i_r][i_c] = ref;
-    for (unsigned int i = 0; i < global_matrix.size(); i++)
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix[i].data()));
-    taskDataPar->inputs_count.emplace_back(count_rows);
-    taskDataPar->inputs_count.emplace_back(count_cols);
-
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_max.data()));
-    taskDataPar->outputs_count.emplace_back(global_max.size());
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_out.data()));
+    taskDataPar->outputs_count.emplace_back(global_out.size());
   }
 
   auto testMpiTaskParallel = std::make_shared<opolin_d_max_of_matrix_elements_mpi::TestMPITaskParallel>(taskDataPar);
@@ -98,6 +100,6 @@ TEST(opolin_d_max_of_matrix_elements_mpi, test_task_run) {
   perfAnalyzer->task_run(perfAttr, perfResults);
   if (world.rank() == 0) {
     ppc::core::Perf::print_perf_statistic(perfResults);
-    ASSERT_EQ(ref, global_max[0]);
+    ASSERT_EQ(res, global_out[0]);
   }
 }

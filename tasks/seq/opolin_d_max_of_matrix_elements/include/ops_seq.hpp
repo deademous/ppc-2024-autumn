@@ -7,10 +7,10 @@
 
 #include "core/task/include/task.hpp"
 
-namespace opolin_d_max_of_matrix_elements_seq {
+std::vector<int> getRandomVectorForGetMaxInMatrix(int sz, int min, int max);
+std::vector<std::vector<int>> getRandomMatrixForGetMaxInMatrix(int rows, int cols, int min, int max);
 
-std::vector<int> getRandomVector(int sz);
-std::vector<std::vector<int>> getRandomMatrix(int rows, int cols);
+namespace opolin_d_max_of_matrix_elements_seq {
 
 class TestTaskSequential : public ppc::core::Task {
  public:
@@ -22,7 +22,7 @@ class TestTaskSequential : public ppc::core::Task {
 
  private:
   std::vector<std::vector<int>> input_;
-  int res_{};
+  int res{};
 };
 
 }  // namespace opolin_d_max_of_matrix_elements_seq
