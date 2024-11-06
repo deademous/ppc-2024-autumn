@@ -12,7 +12,7 @@ TEST(opolin_d_max_of_matrix_elements_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::vector<std::vector<int>> matrix;
   std::vector<int32_t> global_out(1, std::numeric_limits<int32_t>::min());
-
+  int res = std::numeric_limits<int32_t>::max();
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -22,7 +22,6 @@ TEST(opolin_d_max_of_matrix_elements_mpi, test_pipeline_run) {
     int cols = 2000;
     int min = 0;
     int max = 1000;
-    int res = std::numeric_limits<int32_t>::max();
 
     matrix = getRandomMatrixForGetMaxInMatrix(rows, cols, min, max);
     int rand_r = gen() % rows;
@@ -61,7 +60,7 @@ TEST(opolin_d_max_of_matrix_elements_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::vector<std::vector<int>> matrix;
   std::vector<int32_t> global_out(1, std::numeric_limits<int32_t>::min());
-
+  int res = std::numeric_limits<int32_t>::max();
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     std::random_device dev;
@@ -70,7 +69,6 @@ TEST(opolin_d_max_of_matrix_elements_mpi, test_task_run) {
     int cols = 2000;
     int min = 0;
     int max = 1000;
-    int res = std::numeric_limits<int32_t>::max();
 
     matrix = getRandomMatrixForGetMaxInMatrix(rows, cols, min, max);
     int rand_c = gen() % cols;
