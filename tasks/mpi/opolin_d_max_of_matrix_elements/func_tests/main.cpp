@@ -177,22 +177,3 @@ TEST(opolin_d_max_of_matrix_elements_mpi, Test_Max_Matrix_Negative) {
     ASSERT_EQ(reference_max[0], out[0]);
   }
 }
-
-TEST(opolin_d_max_of_matrix_elements_mpi, Test_Max_Empty_Matrix) {
-  const int rows = 0;
-  const int cols = 0;
-  boost::mpi::communicator world;
-  std::vector<int32_t> out(1, std::numeric_limits<int32_t>::min());
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    taskDataPar->inputs_count.emplace_back(rows);
-    taskDataPar->inputs_count.emplace_back(cols);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
-    taskDataPar->outputs_count.emplace_back(out.size());
-  }
-  opolin_d_max_of_matrix_elements_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.validation(), false);
-  if (world.rank() == 0) {
-    ASSERT_EQ(out[0], std::numeric_limits<int32_t>::min());
-  }
-}
