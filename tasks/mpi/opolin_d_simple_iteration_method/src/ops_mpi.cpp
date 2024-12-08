@@ -210,7 +210,7 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
   double iter_sum = 0.0;
   double global_error = 0.0;
   int iter = 0;
-  while (iter < max_iters_) {
+  do {
     broadcast(world, Xold, 0);
 
     for (size_t i = 0; i < local_X.size(); ++i) {
@@ -230,10 +230,9 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
     }
 
     broadcast(world, global_error, 0);
-    if (global_error < epsilon_) break;
     if (world.rank() == 0) Xold = Xnew;
     ++iter;
-  }
+  } while (iter < max_iters_ && global_error > epsilon_)
   return true;
 }
 
