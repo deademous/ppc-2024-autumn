@@ -50,7 +50,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
-  double epsilon = 1e-7;
+  double epsilon = 1e-9;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
@@ -75,12 +75,12 @@ TEST(opolin_d_simple_iteration_method_seq, test_big_system) {
   generateTestData(size, expectedX, A, b);
 
   std::vector<double> out(size, 0.0);
-  
+
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
-  double epsilon = 1e-7;
+  double epsilon = 1e-9;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
@@ -108,12 +108,12 @@ TEST(opolin_d_simple_iteration_method_seq, test_Negative_Values) {
   expectedX = {-1.0, -2.0, -3.0};
 
   std::vector<double> out(size, 0.0);
-  
+
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
-  double epsilon = 1e-7;
+  double epsilon = 1e-9;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
@@ -140,7 +140,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
-  double epsilon = 1e-7;
+  double epsilon = 1e-9;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
