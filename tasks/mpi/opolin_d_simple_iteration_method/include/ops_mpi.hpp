@@ -36,7 +36,7 @@ class TestMPITaskSequential : public ppc::core::Task {
   uint32_t n_;
   double epsilon_;
   int max_iters_;
-  
+
 };
 
 class TestMPITaskParallel : public ppc::core::Task {

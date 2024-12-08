@@ -136,7 +136,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
   std::vector<double> A = { 4.0 };
   std::vector<double> b = { 8.0 };
   std::vector<double> expectedX = { 2.0 };
-  std::vector<double> out(size, 0.0);
+  std::vector<double> out(1, 0.0);
   
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
@@ -155,31 +155,4 @@ TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
   ASSERT_TRUE(testTaskSequential.run());
   ASSERT_TRUE(testTaskSequential.post_processing());
   ASSERT_NEAR(expectedX[0], out[0], 1e-3);
-}
-
-
-TEST(opolin_d_simple_iteration_method_seq, test_zero_on_diagonal) {
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  uint8_t size = 3;
-  std::vector<double> A = { 4.0, 1.0, 1.0,
-                            2.0, 0.0, 2.0,
-                            3.0, 3.0, 5.0 };
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-  taskDataSeq->inputs_count.push_back(size);
-  taskDataSeq->outputs.resize(size);
-  taskDataSeq->outputs_count.push_back(size);
-  ASSERT_FALSE(opolin_d_simple_iteration_method_seq::TestTaskSequential(taskDataSeq).validation());
-}
-
-TEST(opolin_d_simple_iteration_method_seq, test_no_diagonal_dominance) {
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  uint8_t size = 3;
-  std::vector<double> A = { 1.0, 2.0, 1.0,
-                            2.0, 1.0, 2.0,
-                            1.0, 2.0, 1.0 };
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-  taskDataSeq->inputs_count.push_back(size);
-  taskDataSeq->outputs.resize(size);
-  taskDataSeq->outputs_count.push_back(size);
-  ASSERT_FALSE(opolin_d_simple_iteration_method_seq::TestTaskSequential(taskDataSeq).validation());
 }

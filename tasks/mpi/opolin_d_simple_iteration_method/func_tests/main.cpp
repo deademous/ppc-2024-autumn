@@ -12,7 +12,6 @@ double getRandomDouble(double min, double max) {
   std::mt19937 gen(dev());
   return min + (rand() / (static_cast<double>(RAND_MAX)) * (max - min));
 }
-
 void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
   x.resize(size);
   for (int i = 0; i < size; ++i) {
@@ -68,7 +67,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
   testMpiTaskParallel.run();
   testMpiTaskParallel.post_processing();
   if(world.rank() == 0){
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
     }
   }
@@ -90,7 +89,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
     testSeq.run();
     testSeq.post_processing();
 
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_seq[i], x_ref[i], 1e-3);
     }
   }
@@ -126,7 +125,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
   testMpiTaskParallel.run();
   testMpiTaskParallel.post_processing();
   if(world.rank() == 0){
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
     }
   }
@@ -148,7 +147,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
     testSeq.run();
     testSeq.post_processing();
 
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_seq[i], x_ref[i], 1e-3);
     }
   }
@@ -184,7 +183,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_2x2_system) {
   testMpiTaskParallel.run();
   testMpiTaskParallel.post_processing();
   if(world.rank() == 0){
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
     }
   }
@@ -206,7 +205,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_2x2_system) {
     testSeq.run();
     testSeq.post_processing();
 
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_seq[i], x_ref[i], 1e-3);
     }
   }
