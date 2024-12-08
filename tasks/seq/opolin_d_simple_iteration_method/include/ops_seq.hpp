@@ -28,7 +28,6 @@ class TestTaskSequential : public ppc::core::Task {
   double epsilon_;
   uint32_t n_;
   int max_iter_;
-
 };
 
 }  // namespace opolin_d_simple_iteration_method_seq

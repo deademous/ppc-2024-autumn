@@ -49,7 +49,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_ t*>(b.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   double epsilon = 1e-7;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
@@ -131,11 +131,11 @@ TEST(opolin_d_simple_iteration_method_seq, test_Negative_Values) {
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
- std::vector<double> A = {4.0};
+  std::vector<double> A = {4.0};
   std::vector<double> b = {8.0};
   std::vector<double> expectedX = {2.0};
   std::vector<double> out(1, 0.0);
-  
+
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());

@@ -250,7 +250,7 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::post_processing(
 int opolin_d_simple_iteration_method_mpi::rank(std::vector<std::vector<double>> matrix) {
   size_t rowCount = matrix.size();
   if (rowCount == 0) return 0;
-    size_t colCount = matrix[0].size();
+  size_t colCount = matrix[0].size();
   int rank = 0;
 
   for (size_t col = 0, row = 0; col < colCount && row < rowCount; ++col) {

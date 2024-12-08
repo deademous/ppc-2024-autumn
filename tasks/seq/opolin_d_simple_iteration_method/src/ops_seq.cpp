@@ -118,7 +118,7 @@ int opolin_d_simple_iteration_method_seq::rank(std::vector<std::vector<double>> 
   int rank = 0;
   for (size_t col = 0, row = 0; col < colCount && row < rowCount; ++col) {
     size_t maxRowIdx = row;
-    double maxValue = std::abs(matrix[row][col]);    
+    double maxValue = std::abs(matrix[row][col]);
     for (size_t i = row + 1; i < rowCount; ++i) {
       double currentValue = std::abs(matrix[i][col]);
       if (currentValue > maxValue) {
