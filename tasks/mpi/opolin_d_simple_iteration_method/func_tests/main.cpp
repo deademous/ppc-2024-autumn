@@ -12,7 +12,7 @@ double getRandomDouble(double min, double max) {
   std::mt19937 gen(dev());
   return min + (rand() / (static_cast<double>(RAND_MAX)) * (max - min));
 }
-void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(int size, std::vector<double> &x, std::vector<double> &A, std::vector<double> &b) {
   x.resize(size);
   for (int i = 0; i < size; ++i) {
     x[i] = getRandomDouble(-1000.0, 1000.0);
@@ -36,7 +36,6 @@ void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, 
   }
 }
 
-
 TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
   int size = 5;
   double epsilon = 1e-7;
@@ -51,13 +50,13 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
 
   std::shared_ptr<ppc::core::TaskData> taskDataMPI = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
     taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataMPI->inputs_count.emplace_back(x_out.size());
     taskDataMPI->outputs_count.emplace_back(x_out.size());
-    taskDataMPI->outputs.emplace_back(reinterpret_cast<uint8_t*>(x_out.data()));
+    taskDataMPI->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
   }
 
   opolin_d_simple_iteration_method_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataMPI);
@@ -66,7 +65,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
   testMpiTaskParallel.pre_processing();
   testMpiTaskParallel.run();
   testMpiTaskParallel.post_processing();
-  if(world.rank() == 0){
+  if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
     }
@@ -75,13 +74,13 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
   if (world.rank() == 0) {
     std::vector<double> x_seq(size, 0.0);
     std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataSeq->inputs_count.emplace_back(x_seq.size());
     taskDataSeq->outputs_count.emplace_back(x_seq.size());
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(x_seq.data()));
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_seq.data()));
     opolin_d_simple_iteration_method_mpi::TestMPITaskSequential testSeq(taskDataSeq);
 
     ASSERT_EQ(testSeq.validation(), true);
@@ -109,13 +108,13 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
 
   std::shared_ptr<ppc::core::TaskData> taskDataMPI = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
     taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataMPI->inputs_count.emplace_back(x_out.size());
     taskDataMPI->outputs_count.emplace_back(x_out.size());
-    taskDataMPI->outputs.emplace_back(reinterpret_cast<uint8_t*>(x_out.data()));
+    taskDataMPI->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
   }
 
   opolin_d_simple_iteration_method_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataMPI);
@@ -124,7 +123,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
   testMpiTaskParallel.pre_processing();
   testMpiTaskParallel.run();
   testMpiTaskParallel.post_processing();
-  if(world.rank() == 0){
+  if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
     }
@@ -133,13 +132,13 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
   if (world.rank() == 0) {
     std::vector<double> x_seq(size, 0.0);
     std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataSeq->inputs_count.emplace_back(x_seq.size());
     taskDataSeq->outputs_count.emplace_back(x_seq.size());
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(x_seq.data()));
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_seq.data()));
     opolin_d_simple_iteration_method_mpi::TestMPITaskSequential testSeq(taskDataSeq);
 
     ASSERT_EQ(testSeq.validation(), true);
@@ -167,13 +166,13 @@ TEST(opolin_d_simple_iteration_method_mpi, test_2x2_system) {
 
   std::shared_ptr<ppc::core::TaskData> taskDataMPI = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+    taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
     taskDataMPI->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataMPI->inputs_count.emplace_back(x_out.size());
     taskDataMPI->outputs_count.emplace_back(x_out.size());
-    taskDataMPI->outputs.emplace_back(reinterpret_cast<uint8_t*>(x_out.data()));
+    taskDataMPI->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
   }
 
   opolin_d_simple_iteration_method_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataMPI);
@@ -182,7 +181,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_2x2_system) {
   testMpiTaskParallel.pre_processing();
   testMpiTaskParallel.run();
   testMpiTaskParallel.post_processing();
-  if(world.rank() == 0){
+  if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
     }
@@ -191,13 +190,13 @@ TEST(opolin_d_simple_iteration_method_mpi, test_2x2_system) {
   if (world.rank() == 0) {
     std::vector<double> x_seq(size, 0.0);
     std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataSeq->inputs_count.emplace_back(x_seq.size());
     taskDataSeq->outputs_count.emplace_back(x_seq.size());
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(x_seq.data()));
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_seq.data()));
     opolin_d_simple_iteration_method_mpi::TestMPITaskSequential testSeq(taskDataSeq);
 
     ASSERT_EQ(testSeq.validation(), true);

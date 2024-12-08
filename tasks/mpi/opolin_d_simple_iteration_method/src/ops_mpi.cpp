@@ -13,7 +13,7 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::pre_processing
   auto* ptr = reinterpret_cast<double*>(taskData->inputs[1]);
   b_.assign(ptr, ptr + n_);
   epsilon_ = *reinterpret_cast<double*>(taskData->inputs[2]);
-  C_.resize(n_* n_, 0.0);
+  C_.resize(n_ * n_, 0.0);
   d_.resize(n_, 0.0);
   Xold.resize(n_, 0.0);
   Xnew.resize(n_, 0.0);
@@ -42,10 +42,9 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::pre_processing
 bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::validation() {
   internal_order_test();
   // check input and output
-  if (taskData->inputs_count.empty() || taskData->inputs.size() != 4)
-    return false;
+  if (taskData->inputs_count.empty() || taskData->inputs.size() != 4) return false;
   if (taskData->outputs_count.empty() || taskData->inputs_count[0] != taskData->outputs_count[0] ||
-    taskData->outputs.empty())
+      taskData->outputs.empty())
     return false;
 
   n_ = taskData->inputs_count[0];
@@ -96,12 +95,12 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::run() {
     for (size_t i = 0; i < n_; ++i) {
       error = std::max(error, std::abs(Xnew[i] - Xold[i]));
     }
-    
+
     if (error < epsilon_) break;
     Xold = Xnew;
     ++iter;
   }
-  return true;  
+  return true;
 }
 
 bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::post_processing() {
@@ -147,12 +146,11 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::pre_processing()
 
 bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::validation() {
   internal_order_test();
-  if(world.rank() == 0){
+  if (world.rank() == 0) {
     // check input and output
-    if (taskData->inputs_count.empty() || taskData->inputs.size() != 4)
-    return false;
+    if (taskData->inputs_count.empty() || taskData->inputs.size() != 4) return false;
     if (taskData->outputs_count.empty() || taskData->inputs_count[0] != taskData->outputs_count[0] ||
-      taskData->outputs.empty())
+        taskData->outputs.empty())
       return false;
 
     n_ = taskData->inputs_count[0];
@@ -191,10 +189,10 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
   broadcast(world, n_, 0);
   broadcast(world, epsilon_, 0);
   broadcast(world, max_iters_, 0);
-  
+
   int32_t base_rows = n_ / world.size();
   int32_t remainder = n_ % world.size();
-    
+
   std::vector<int32_t> rows_per_worker(world.size());
   std::vector<int32_t> elements_per_worker(world.size());
   for (int rank = 0; rank < world.size(); ++rank) {
@@ -253,41 +251,41 @@ int opolin_d_simple_iteration_method_mpi::rank(std::vector<std::vector<double>> 
   size_t rowCount = matrix.size();
   if (rowCount == 0) return 0;
     size_t colCount = matrix[0].size();
-    int rank = 0;
+  int rank = 0;
 
-    for (size_t col = 0, row = 0; col < colCount && row < rowCount; ++col) {
-      size_t maxRowIdx = row;
-      double maxValue = std::abs(matrix[row][col]);    
-      for (size_t i = row + 1; i < rowCount; ++i) {
-        double currentValue = std::abs(matrix[i][col]);
-        if (currentValue > maxValue) {
-          maxValue = currentValue;
-          maxRowIdx = i;
+  for (size_t col = 0, row = 0; col < colCount && row < rowCount; ++col) {
+    size_t maxRowIdx = row;
+    double maxValue = std::abs(matrix[row][col]);
+    for (size_t i = row + 1; i < rowCount; ++i) {
+      double currentValue = std::abs(matrix[i][col]);
+      if (currentValue > maxValue) {
+        maxValue = currentValue;
+        maxRowIdx = i;
+      }
+    }
+    if (maxValue < std::numeric_limits<double>::epsilon()) continue;
+
+    if (maxRowIdx != row) {
+      for (size_t j = 0; j < colCount; ++j) {
+        double temp = matrix[row][j];
+        matrix[row][j] = matrix[maxRowIdx][j];
+        matrix[maxRowIdx][j] = temp;
+      }
+    }
+
+    double leadElement = matrix[row][col];
+    for (size_t j = col; j < colCount; ++j) {
+      matrix[row][j] /= leadElement;
+    }
+
+    for (size_t i = 0; i < rowCount; ++i) {
+      if (i != row) {
+        double factor = matrix[i][col];
+        for (size_t j = col; j < colCount; ++j) {
+          matrix[i][j] -= factor * matrix[row][j];
         }
       }
-      if (maxValue < std::numeric_limits<double>::epsilon()) continue;
-
-      if (maxRowIdx != row) {
-        for (size_t j = 0; j < colCount; ++j) {
-          double temp = matrix[row][j];
-          matrix[row][j] = matrix[maxRowIdx][j];
-          matrix[maxRowIdx][j] = temp;
-        }
-      }
-
-      double leadElement = matrix[row][col];
-      for (size_t j = col; j < colCount; ++j) {
-        matrix[row][j] /= leadElement;
-      }
-
-      for (size_t i = 0; i < rowCount; ++i) {
-        if (i != row) {
-          double factor = matrix[i][col];
-          for (size_t j = col; j < colCount; ++j) {
-            matrix[i][j] -= factor * matrix[row][j];
-          }
-        }
-      }
+    }
     ++rank;
     ++row;
   }

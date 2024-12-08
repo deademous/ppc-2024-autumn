@@ -14,7 +14,7 @@ double getRandomDouble(double min, double max) {
   return min + (gen() / (static_cast<double>(RAND_MAX)) * (max - min));
 }
 
-void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(int size, std::vector<double> &x, std::vector<double> &A, std::vector<double> &b) {
   x.resize(size);
   for (int i = 0; i < size; ++i) {
     x[i] = getRandomDouble(-1000.0, 1000.0);
@@ -48,14 +48,14 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     // Create data
-    generateTestData(size ,X ,A ,b);
+    generateTestData(size, X, A, b);
     double epsilon = 1e-5;
     int maxIters = 1000;
     std::vector<double> out(size, 0.0);
     // Create TaskData
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
     taskDataPar->inputs_count.emplace_back(out.size());
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
@@ -94,15 +94,15 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   std::vector<double> X;
   if (world.rank() == 0) {
     // Create data
-    generateTestData(size ,X ,A ,b);
+    generateTestData(size, X, A, b);
     double epsilon = 1e-5;
     int maxIters = 1000;
     std::vector<double> out(size, 0.0);
 
     // Create TaskData
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
     taskDataPar->inputs_count.emplace_back(out.size());
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));

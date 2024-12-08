@@ -13,7 +13,7 @@ double getRandomDouble(double min, double max) {
   return min + (gen() / (static_cast<double>(RAND_MAX)) * (max - min));
 }
 
-void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(int size, std::vector<double> &x, std::vector<double> &A, std::vector<double> &b) {
   x.resize(size);
   for (int i = 0; i < size; ++i) {
     x[i] = getRandomDouble(-1000.0, 1000.0);
@@ -42,15 +42,15 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
-  generateTestData(size,X, A, b);
+  generateTestData(size, X, A, b);
   std::vector<double> out(size, 0);
   double epsilon = 1e-5;
   int maxIters = 1000;
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
@@ -83,7 +83,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
-  generateTestData(size,X, A, b);
+  generateTestData(size, X, A, b);
 
   std::vector<double> out(size, 0);
   double epsilon = 1e-5;

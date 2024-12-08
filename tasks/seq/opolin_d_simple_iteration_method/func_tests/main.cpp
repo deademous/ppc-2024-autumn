@@ -13,7 +13,7 @@ double getRandomDouble(double min, double max) {
   return min + (rand() / (static_cast<double>(RAND_MAX)) * (max - min));
 }
 
-void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(int size, std::vector<double> &x, std::vector<double> &A, std::vector<double> &b) {
   x.resize(size);
   for (int i = 0; i < size; ++i) {
     x[i] = getRandomDouble(-1000.0, 1000.0);
@@ -45,16 +45,16 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   generateTestData(size, expectedX, A, b);
 
   std::vector<double> out(size, 0.0);
-  
+
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_ t*>(b.data()));
   double epsilon = 1e-7;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   taskDataSeq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential testTaskSequential(taskDataSeq);
@@ -77,14 +77,14 @@ TEST(opolin_d_simple_iteration_method_seq, test_big_system) {
   std::vector<double> out(size, 0.0);
   
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   double epsilon = 1e-7;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   taskDataSeq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential testTaskSequential(taskDataSeq);
@@ -102,24 +102,22 @@ TEST(opolin_d_simple_iteration_method_seq, test_Negative_Values) {
   std::mt19937 gen(dev());
   int size = 3;
   std::vector<double> expectedX, A, b;
-  
-  A = { 5.0, -1.0, 2.0,
-    -1.0, 6.0, -1.0,
-    2.0, -1.0, 7.0 };
+
+  A = {5.0, -1.0, 2.0, -1.0, 6.0, -1.0, 2.0, -1.0, 7.0};
   b = {-9.0, -8.0, -21.0};
   expectedX = {-1.0, -2.0, -3.0};
 
   std::vector<double> out(size, 0.0);
   
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   double epsilon = 1e-7;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   taskDataSeq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential testTaskSequential(taskDataSeq);
@@ -133,20 +131,20 @@ TEST(opolin_d_simple_iteration_method_seq, test_Negative_Values) {
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
-  std::vector<double> A = { 4.0 };
-  std::vector<double> b = { 8.0 };
-  std::vector<double> expectedX = { 2.0 };
+ std::vector<double> A = {4.0};
+  std::vector<double> b = {8.0};
+  std::vector<double> expectedX = {2.0};
   std::vector<double> out(1, 0.0);
   
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   double epsilon = 1e-7;
   int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   taskDataSeq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential testTaskSequential(taskDataSeq);
