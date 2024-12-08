@@ -232,7 +232,7 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
     broadcast(world, global_error, 0);
     if (world.rank() == 0) Xold = Xnew;
     ++iter;
-  } while (iter < max_iters_ && global_error > epsilon_)
+  } while (iter < max_iters_ && global_error > epsilon_);
   return true;
 }
 
