@@ -14,7 +14,7 @@ double getRandomDouble(double min, double max) {
   return min + (gen() / (static_cast<double>(RAND_MAX)) * (max - min));
 }
 
-void generateTestData(uint8_t size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
   x.resize(size);
   for (int i = 0; i < size; ++i) {
     x[i] = getRandomDouble(-1000.0, 1000.0);
@@ -41,7 +41,7 @@ void generateTestData(uint8_t size, std::vector<double>& x, std::vector<double>&
 TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  uint8_t size = 500;
+  int size = 500;
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
@@ -88,7 +88,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
-   uint8_t size = 500;
+  int size = 500;
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;

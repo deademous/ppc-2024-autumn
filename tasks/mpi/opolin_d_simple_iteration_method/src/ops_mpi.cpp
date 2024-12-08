@@ -213,13 +213,11 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
   double global_error = 0.0;
   int iter = 0;
   while (iter < max_iters_) {
-    // Рассылаем текущий вектор Xold всем процессам
     broadcast(world, Xold, 0);
 
-    // Локальный подсчёт Xnew
-    for (int32_t i = 0; i < local_X.size(); ++i) {
+    for (size_t i = 0; i < local_X.size(); ++i) {
       iter_sum = 0.0;
-      for (int32_t j = 0; j < Xold.size(); ++j) {
+      for (size_t j = 0; j < Xold.size(); ++j) {
         iter_sum += local_C[i * n_ + j] * Xold[j];
       }
       local_X[i] = local_d[i] + iter_sum;

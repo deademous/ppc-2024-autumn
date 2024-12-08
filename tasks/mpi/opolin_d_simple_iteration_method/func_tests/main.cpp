@@ -13,7 +13,7 @@ double getRandomDouble(double min, double max) {
   return min + (rand() / (static_cast<double>(RAND_MAX)) * (max - min));
 }
 
-void generateTestData(uint8_t size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
   x.resize(size);
   for (int i = 0; i < size; ++i) {
     x[i] = getRandomDouble(-1000.0, 1000.0);
@@ -39,7 +39,7 @@ void generateTestData(uint8_t size, std::vector<double>& x, std::vector<double>&
 
 
 TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
-  uint8_t size = 5;
+  int size = 5;
   double epsilon = 1e-7;
   int maxIters = 1000;
 
@@ -97,7 +97,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
 }
 
 TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
-  uint8_t size = 100;
+  int size = 100;
   double epsilon = 1e-7;
   int maxIters = 1000;
 
@@ -155,7 +155,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
 }
 
 TEST(opolin_d_simple_iteration_method_mpi, test_2x2_system) {
-  uint8_t size = 2;
+  int size = 2;
   double epsilon = 1e-7;
   int maxIters = 1000;
 

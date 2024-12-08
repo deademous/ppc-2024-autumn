@@ -13,7 +13,7 @@ double getRandomDouble(double min, double max) {
   return min + (rand() / (static_cast<double>(RAND_MAX)) * (max - min));
 }
 
-void generateTestData(uint8_t size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(int size, std::vector<double>& x, std::vector<double>& A, std::vector<double>& b) {
   x.resize(size);
   for (int i = 0; i < size; ++i) {
     x[i] = getRandomDouble(-1000.0, 1000.0);
@@ -40,7 +40,7 @@ void generateTestData(uint8_t size, std::vector<double>& x, std::vector<double>&
 TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   std::random_device dev;
   std::mt19937 gen(dev());
-  uint8_t size = 3;
+  int size = 3;
   std::vector<double> expectedX, A, b;
   generateTestData(size, expectedX, A, b);
 
@@ -70,7 +70,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
 TEST(opolin_d_simple_iteration_method_seq, test_big_system) {
   std::random_device dev;
   std::mt19937 gen(dev());
-  uint8_t size = 100;
+  int size = 100;
   std::vector<double> expectedX, A, b;
   generateTestData(size, expectedX, A, b);
 
@@ -100,7 +100,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_big_system) {
 TEST(opolin_d_simple_iteration_method_seq, test_Negative_Values) {
   std::random_device dev;
   std::mt19937 gen(dev());
-  uint8_t size = 3;
+  int size = 3;
   std::vector<double> expectedX, A, b;
   
   A = { 5.0, -1.0, 2.0,
@@ -133,7 +133,6 @@ TEST(opolin_d_simple_iteration_method_seq, test_Negative_Values) {
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
-  uint8_t size = 1;
   std::vector<double> A = { 4.0 };
   std::vector<double> b = { 8.0 };
   std::vector<double> expectedX = { 2.0 };
