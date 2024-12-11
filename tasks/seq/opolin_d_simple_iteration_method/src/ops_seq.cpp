@@ -95,9 +95,8 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::run() {
     for (size_t i = 0; i < n_; ++i) {
       error = std::max(error, std::abs(Xnew[i] - Xold[i]));
     }
-
-    if (error < epsilon_) break;
     Xold = Xnew;
+    if (error < epsilon_) break;
     ++iter;
   }
   return true;

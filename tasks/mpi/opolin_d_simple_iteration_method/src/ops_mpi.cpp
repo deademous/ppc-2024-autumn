@@ -95,9 +95,8 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::run() {
     for (size_t i = 0; i < n_; ++i) {
       error = std::max(error, std::abs(Xnew[i] - Xold[i]));
     }
-
-    if (error < epsilon_) break;
     Xold = Xnew;
+    if (error < epsilon_) break;
     ++iter;
   }
   return true;
@@ -215,7 +214,7 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
 
     for (int i = 0; i < rows_per_worker[world.rank()]; ++i) {
       double iter_sum = 0.0;
-      for (int j = 0; j < Xold.size(); ++j) {
+      for (size_t j = 0; j < Xold.size(); ++j) {
         iter_sum += local_C[i * n_ + j] * Xold[j];
       }
       local_X[i] = local_d[i] + iter_sum;
