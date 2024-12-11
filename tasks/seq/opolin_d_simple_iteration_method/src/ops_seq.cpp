@@ -81,10 +81,9 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::run() {
   internal_order_test();
   // simple iteration method
   int iter = 0;
-  double iter_sum = 0.0;
   while (iter < max_iter_) {
     for (size_t i = 0; i < n_; ++i) {
-      iter_sum = 0.0;
+      double iter_sum = 0.0;
       for (size_t j = 0; j < n_; ++j) {
         if (i != j) {
           iter_sum += C_[i * n_ + j] * Xold[j];

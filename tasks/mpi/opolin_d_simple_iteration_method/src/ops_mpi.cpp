@@ -189,6 +189,7 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
   broadcast(world, n_, 0);
   broadcast(world, epsilon_, 0);
   broadcast(world, max_iters_, 0);
+  Xnew.resize(n_);
 
   int32_t base_rows = n_ / world.size();
   int32_t remainder = n_ % world.size();
@@ -207,15 +208,14 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
   scatterv(world, C_, elements_per_worker, local_C.data(), 0);
   scatterv(world, d_, rows_per_worker, local_d.data(), 0);
 
-  double iter_sum = 0.0;
   double global_error = 0.0;
   int iter = 0;
   do {
     broadcast(world, Xold, 0);
 
-    for (size_t i = 0; i < local_X.size(); ++i) {
-      iter_sum = 0.0;
-      for (size_t j = 0; j < Xold.size(); ++j) {
+    for (int i = 0; i < rows_per_worker[world.rank()]; ++i) {
+      double iter_sum = 0.0;
+      for (int j = 0; j < Xold.size(); ++j) {
         iter_sum += local_C[i * n_ + j] * Xold[j];
       }
       local_X[i] = local_d[i] + iter_sum;
@@ -225,7 +225,8 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
 
     if (world.rank() == 0) {
       for (size_t i = 0; i < n_; ++i) {
-        global_error = std::max(global_error, std::abs(Xnew[i] - Xold[i]));
+        double error = std::abs(Xnew[i] - Xold[i]);
+        global_error = std::max(global_error, error);
       }
     }
 
