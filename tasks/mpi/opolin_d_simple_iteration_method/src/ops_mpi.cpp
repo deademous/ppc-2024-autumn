@@ -76,7 +76,7 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::run() {
           sum += C_[i * n_ + j] * Xold_[j];
         }
       }
-      Xnew_[i] = sum; 
+      Xnew_[i] = sum;
     }
     double max_error = 0.0;
     for (size_t i = 0; i < n_; ++i) {
@@ -86,10 +86,14 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::run() {
       }
     }
     Xold_ = Xnew_;
-    if (max_error < epsilon_) { break; }
+    if (max_error < epsilon_) {
+      break;
+    }
     ++iteration;
   }
-  if (iteration == max_iters_) { return false; }
+  if (iteration == max_iters_) {
+    return false;
+  }
   return true;
 }
 
@@ -105,26 +109,26 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::pre_processing()
   // init data
   if (world.rank() == 0) {
     auto* ptr = reinterpret_cast<double*>(taskData->inputs[1]);
-  b_.assign(ptr, ptr + n_);
-  epsilon_ = *reinterpret_cast<double*>(taskData->inputs[2]);
-  C_.resize(n_ * n_, 0.0);
-  d_.resize(n_, 0.0);
-  Xold_.resize(n_, 0.0);
-  Xnew_.resize(n_, 0.0);
-  max_iters_ = *reinterpret_cast<int*>(taskData->inputs[3]);
-  std::vector<double> augmen_matrix = A_;
-  for (size_t i = 0; i < n_; ++i) {
-    augmen_matrix.push_back(b_[i]);
-  }
-  // generate C matrix and d vector
-  for (size_t i = 0; i < n_; ++i) {
-    for (size_t j = 0; j < n_; ++j) {
-      if (i != j) {
-        C_[i * n_ + j] = -A_[i * n_ + j] / A_[i * n_ + i];
-      }
+    b_.assign(ptr, ptr + n_);
+    epsilon_ = *reinterpret_cast<double*>(taskData->inputs[2]);
+    C_.resize(n_ * n_, 0.0);
+    d_.resize(n_, 0.0);
+    Xold_.resize(n_, 0.0);
+    Xnew_.resize(n_, 0.0);
+    max_iters_ = *reinterpret_cast<int*>(taskData->inputs[3]);
+    std::vector<double> augmen_matrix = A_;
+    for (size_t i = 0; i < n_; ++i) {
+      augmen_matrix.push_back(b_[i]);
     }
-    d_[i] = b_[i] / A_[i * n_ + i];
-  }
+    // generate C matrix and d vector
+    for (size_t i = 0; i < n_; ++i) {
+      for (size_t j = 0; j < n_; ++j) {
+        if (i != j) {
+          C_[i * n_ + j] = -A_[i * n_ + j] / A_[i * n_ + i];
+        }
+      }
+      d_[i] = b_[i] / A_[i * n_ + i];
+    }
   }
   return true;
 }
@@ -135,8 +139,8 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::validation() {
     // check input and output
     if (taskData->inputs_count.empty() || taskData->inputs.size() != 4) return false;
     if (taskData->outputs_count.empty() || taskData->inputs_count[0] != taskData->outputs_count[0] ||
-      taskData->outputs.empty())
-    return false;
+        taskData->outputs.empty())
+      return false;
 
     n_ = taskData->inputs_count[0];
     if (n_ <= 0) return false;
@@ -278,7 +282,7 @@ size_t opolin_d_simple_iteration_method_mpi::rank(std::vector<double> matrix, si
   return rank;
 }
 
-bool opolin_d_simple_iteration_method_mpi::isDiagonalDominance(std::vector<double> mat, size_t dim){
+bool opolin_d_simple_iteration_method_mpi::isDiagonalDominance(std::vector<double> mat, size_t dim) {
   for (size_t i = 0; i < dim; i++) {
     double diagonal_value = std::abs(mat[i * dim + i]);
     double row_sum = 0.0;

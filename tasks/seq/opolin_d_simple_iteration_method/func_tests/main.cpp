@@ -7,7 +7,7 @@
 
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
 
-void generateTestData(size_t size, std::vector<double>& X, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
   std::srand(static_cast<unsigned>(std::time(nullptr)));
 
   X.resize(size);

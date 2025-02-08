@@ -69,7 +69,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::run() {
           sum += C_[i * n_ + j] * Xold_[j];
         }
       }
-      Xnew_[i] = sum; 
+      Xnew_[i] = sum;
     }
     double max_error = 0.0;
     for (size_t i = 0; i < n_; ++i) {
@@ -79,10 +79,14 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::run() {
       }
     }
     Xold_ = Xnew_;
-    if (max_error < epsilon_) { break; }
+    if (max_error < epsilon_) {
+      break;
+    }
     ++iteration;
   }
-  if (iteration == max_iter_) { return false; }
+  if (iteration == max_iter_) {
+    return false;
+  }
 
   return true;
 }

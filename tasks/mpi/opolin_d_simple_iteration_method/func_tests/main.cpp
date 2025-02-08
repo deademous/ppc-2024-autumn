@@ -7,7 +7,7 @@
 
 #include "mpi/opolin_d_simple_iteration_method/include/ops_mpi.hpp"
 
-void generateTestData(size_t size, std::vector<double>& X, std::vector<double>& A, std::vector<double>& b) {
+void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
   std::srand(static_cast<unsigned>(std::time(nullptr)));
 
   X.resize(size);
@@ -420,8 +420,8 @@ TEST(opolin_d_simple_iteration_method_mpi, test_single_element) {
 
   std::vector<double> x_ref, A, b;
   A = {1.0};
-  b = {10.0 };
-  x_ref = { 10.0 };
+  b = {10.0};
+  x_ref = {10.0};
 
   std::vector<double> x_out(size, 0.0);
 
