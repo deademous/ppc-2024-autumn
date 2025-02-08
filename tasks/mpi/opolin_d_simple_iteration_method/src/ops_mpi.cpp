@@ -67,7 +67,7 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::validation() {
 bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::run() {
   internal_order_test();
   // simple iteration method
-  size_t iteration = 0;
+  int iteration = 0;
   while (iteration < max_iters_) {
     for (size_t i = 0; i < n_; ++i) {
       double sum = d_[i];
@@ -232,7 +232,7 @@ size_t opolin_d_simple_iteration_method_mpi::rank(std::vector<double> matrix, si
   size_t rowCount = n;
   if (rowCount == 0) return 0;
   size_t colCount = n;
-  int rank = 0;
+  size_t rank = 0;
   for (size_t col = 0, row = 0; col < colCount && row < rowCount; ++col) {
     size_t maxRowIdx = row;
     double maxValue = std::abs(matrix[row * n + col]);
