@@ -15,26 +15,21 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::pre_processing
   epsilon_ = *reinterpret_cast<double*>(taskData->inputs[2]);
   C_.resize(n_ * n_, 0.0);
   d_.resize(n_, 0.0);
-  Xold.resize(n_, 0.0);
-  Xnew.resize(n_, 0.0);
+  Xold_.resize(n_, 0.0);
+  Xnew_.resize(n_, 0.0);
   max_iters_ = *reinterpret_cast<int*>(taskData->inputs[3]);
-  std::vector<std::vector<double>> augmen_matrix = A_;
+  std::vector<double> augmen_matrix = A_;
   for (size_t i = 0; i < n_; ++i) {
-    augmen_matrix[i].push_back(b_[i]);
-  }
-  int rankA = rank(A_);
-  int rank_augmented = rank(augmen_matrix);
-  if (rankA != rank_augmented) {
-    return false;
+    augmen_matrix.push_back(b_[i]);
   }
   // generate C matrix and d vector
   for (size_t i = 0; i < n_; ++i) {
     for (size_t j = 0; j < n_; ++j) {
       if (i != j) {
-        C_[i * n_ + j] = -A_[i][j] / A_[i][i];
+        C_[i * n_ + j] = -A_[i * n_ + j] / A_[i * n_ + i];
       }
     }
-    d_[i] = b_[i] / A_[i][i];
+    d_[i] = b_[i] / A_[i * n_ + i];
   }
   return true;
 }
@@ -48,30 +43,23 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::validation() {
     return false;
 
   n_ = taskData->inputs_count[0];
+  if (n_ <= 0) return false;
   auto* ptr = reinterpret_cast<double*>(taskData->inputs[0]);
-  A_.resize(n_);
-  for (size_t i = 0; i < n_; i++, ptr += n_) A_[i].assign(ptr, ptr + n_);
+  A_.assign(ptr, ptr + n_ * n_);
+  // check ranks
+  size_t rankA = rank(A_, n_);
+  if (rankA != n_) {
+    return false;
+  }
 
   // check main diagonal
   for (size_t i = 0; i < n_; ++i) {
-    if (std::abs(A_[i][i]) < std::numeric_limits<double>::epsilon()) {
+    if (std::abs(A_[i * n_ + i]) < std::numeric_limits<double>::epsilon()) {
       return false;
     }
   }
-  // check method applicability
-  for (size_t i = 0; i < n_; ++i) {
-    double diagonal = std::abs(A_[i][i]);
-    double sum_row = 0.0;
-    double sum_col = 0.0;
-    for (size_t j = 0; j < n_; ++j) {
-      if (i != j) {
-        sum_row += std::abs(A_[i][j]);
-        sum_col += std::abs(A_[j][i]);
-      }
-    }
-    if (diagonal <= sum_row && diagonal <= sum_col) {
-      return false;
-    }
+  if (!isDiagonalDominance(A_, n_)) {
+    return false;
   }
   return true;
 }
@@ -79,33 +67,36 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::validation() {
 bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::run() {
   internal_order_test();
   // simple iteration method
-  int iter = 0;
-  double iter_sum = 0.0;
-  while (iter < max_iters_) {
+  size_t iteration = 0;
+  while (iteration < max_iters_) {
     for (size_t i = 0; i < n_; ++i) {
-      iter_sum = 0.0;
+      double sum = d_[i];
       for (size_t j = 0; j < n_; ++j) {
         if (i != j) {
-          iter_sum += C_[i * n_ + j] * Xold[j];
+          sum += C_[i * n_ + j] * Xold_[j];
         }
       }
-      Xnew[i] = d_[i] + iter_sum;
+      Xnew_[i] = sum; 
     }
-    double error = 0.0;
+    double max_error = 0.0;
     for (size_t i = 0; i < n_; ++i) {
-      error = std::max(error, std::abs(Xnew[i] - Xold[i]));
+      double error = std::abs(Xnew_[i] - Xold_[i]);
+      if (error > max_error) {
+        max_error = error;
+      }
     }
-    Xold = Xnew;
-    if (error < epsilon_) break;
-    ++iter;
+    Xold_ = Xnew_;
+    if (max_error < epsilon_) { break; }
+    ++iteration;
   }
+  if (iteration == max_iters_) { return false; }
   return true;
 }
 
 bool opolin_d_simple_iteration_method_mpi::TestMPITaskSequential::post_processing() {
   internal_order_test();
   auto* out = reinterpret_cast<double*>(taskData->outputs[0]);
-  std::copy(Xnew.begin(), Xnew.end(), out);
+  std::copy(Xnew_.begin(), Xnew_.end(), out);
   return true;
 }
 
@@ -114,31 +105,26 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::pre_processing()
   // init data
   if (world.rank() == 0) {
     auto* ptr = reinterpret_cast<double*>(taskData->inputs[1]);
-    b_.assign(ptr, ptr + n_);
-    epsilon_ = *reinterpret_cast<double*>(taskData->inputs[2]);
-    C_.resize(n_ * n_, 0.0);
-    d_.resize(n_, 0.0);
-    Xold.resize(n_, 0.0);
-    Xnew.resize(n_, 0.0);
-    max_iters_ = *reinterpret_cast<int*>(taskData->inputs[3]);
-    std::vector<std::vector<double>> augmen_matrix = A_;
-    for (size_t i = 0; i < n_; ++i) {
-      augmen_matrix[i].push_back(b_[i]);
-    }
-    int rankA = rank(A_);
-    int rank_augmented = rank(augmen_matrix);
-    if (rankA != rank_augmented) {
-      return false;
-    }
-    // generate C matrix and d vector
-    for (size_t i = 0; i < n_; ++i) {
-      for (size_t j = 0; j < n_; ++j) {
-        if (i != j) {
-          C_[i * n_ + j] = -A_[i][j] / A_[i][i];
-        }
+  b_.assign(ptr, ptr + n_);
+  epsilon_ = *reinterpret_cast<double*>(taskData->inputs[2]);
+  C_.resize(n_ * n_, 0.0);
+  d_.resize(n_, 0.0);
+  Xold_.resize(n_, 0.0);
+  Xnew_.resize(n_, 0.0);
+  max_iters_ = *reinterpret_cast<int*>(taskData->inputs[3]);
+  std::vector<double> augmen_matrix = A_;
+  for (size_t i = 0; i < n_; ++i) {
+    augmen_matrix.push_back(b_[i]);
+  }
+  // generate C matrix and d vector
+  for (size_t i = 0; i < n_; ++i) {
+    for (size_t j = 0; j < n_; ++j) {
+      if (i != j) {
+        C_[i * n_ + j] = -A_[i * n_ + j] / A_[i * n_ + i];
       }
-      d_[i] = b_[i] / A_[i][i];
     }
+    d_[i] = b_[i] / A_[i * n_ + i];
+  }
   }
   return true;
 }
@@ -149,34 +135,27 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::validation() {
     // check input and output
     if (taskData->inputs_count.empty() || taskData->inputs.size() != 4) return false;
     if (taskData->outputs_count.empty() || taskData->inputs_count[0] != taskData->outputs_count[0] ||
-        taskData->outputs.empty())
-      return false;
+      taskData->outputs.empty())
+    return false;
 
     n_ = taskData->inputs_count[0];
+    if (n_ <= 0) return false;
     auto* ptr = reinterpret_cast<double*>(taskData->inputs[0]);
-    A_.resize(n_);
-    for (size_t i = 0; i < n_; i++, ptr += n_) A_[i].assign(ptr, ptr + n_);
+    A_.assign(ptr, ptr + n_ * n_);
 
+    // check ranks
+    size_t rankA = rank(A_, n_);
+    if (rankA != n_) {
+      return false;
+    }
     // check main diagonal
     for (size_t i = 0; i < n_; ++i) {
-      if (std::abs(A_[i][i]) < std::numeric_limits<double>::epsilon()) {
+      if (std::abs(A_[i * n_ + i]) < std::numeric_limits<double>::epsilon()) {
         return false;
       }
     }
-    // check method applicability
-    for (size_t i = 0; i < n_; ++i) {
-      double diagonal = std::abs(A_[i][i]);
-      double sum_row = 0.0;
-      double sum_col = 0.0;
-      for (size_t j = 0; j < n_; ++j) {
-        if (i != j) {
-          sum_row += std::abs(A_[i][j]);
-          sum_col += std::abs(A_[j][i]);
-        }
-      }
-      if (diagonal <= sum_row && diagonal <= sum_col) {
-        return false;
-      }
+    if (!isDiagonalDominance(A_, n_)) {
+      return false;
     }
   }
   return true;
@@ -188,7 +167,8 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
   broadcast(world, n_, 0);
   broadcast(world, epsilon_, 0);
   broadcast(world, max_iters_, 0);
-  Xnew.resize(n_);
+  Xnew_.resize(n_);
+  Xold_.resize(n_);
 
   int32_t base_rows = n_ / world.size();
   int32_t remainder = n_ % world.size();
@@ -208,31 +188,33 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::run() {
   scatterv(world, d_, rows_per_worker, local_d.data(), 0);
 
   double global_error = 0.0;
-  int iter = 0;
+  int iteration = 0;
   do {
-    broadcast(world, Xold, 0);
+    broadcast(world, Xold_, 0);
 
     for (int i = 0; i < rows_per_worker[world.rank()]; ++i) {
-      double iter_sum = 0.0;
-      for (size_t j = 0; j < Xold.size(); ++j) {
-        iter_sum += local_C[i * n_ + j] * Xold[j];
+      double sum = local_d[i];
+      for (size_t j = 0; j < Xold_.size(); ++j) {
+        sum += local_C[i * n_ + j] * Xold_[j];
       }
-      local_X[i] = local_d[i] + iter_sum;
+      local_X[i] = sum;
     }
 
-    gatherv(world, local_X, Xnew.data(), rows_per_worker, 0);
+    gatherv(world, local_X, Xnew_.data(), rows_per_worker, 0);
 
     if (world.rank() == 0) {
+      global_error = 0.0;
       for (size_t i = 0; i < n_; ++i) {
-        double error = std::abs(Xnew[i] - Xold[i]);
+        double error = std::abs(Xnew_[i] - Xold_[i]);
         global_error = std::max(global_error, error);
       }
     }
 
     broadcast(world, global_error, 0);
-    if (world.rank() == 0) Xold = Xnew;
-    ++iter;
-  } while (iter < max_iters_ && global_error > epsilon_);
+    if (world.rank() == 0) Xold_ = Xnew_;
+    ++iteration;
+    broadcast(world, iteration, 0);
+  } while (iteration < max_iters_ && global_error > epsilon_);
   return true;
 }
 
@@ -241,52 +223,75 @@ bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::post_processing(
 
   if (world.rank() == 0) {
     auto* out = reinterpret_cast<double*>(taskData->outputs[0]);
-    std::copy(Xnew.begin(), Xnew.end(), out);
+    std::copy(Xnew_.begin(), Xnew_.end(), out);
   }
   return true;
 }
 
-int opolin_d_simple_iteration_method_mpi::rank(std::vector<std::vector<double>> matrix) {
-  size_t rowCount = matrix.size();
+size_t opolin_d_simple_iteration_method_mpi::rank(std::vector<double> matrix, size_t n) {
+  size_t rowCount = n;
   if (rowCount == 0) return 0;
-  size_t colCount = matrix[0].size();
+  size_t colCount = n;
   int rank = 0;
-
   for (size_t col = 0, row = 0; col < colCount && row < rowCount; ++col) {
     size_t maxRowIdx = row;
-    double maxValue = std::abs(matrix[row][col]);
+    double maxValue = std::abs(matrix[row * n + col]);
     for (size_t i = row + 1; i < rowCount; ++i) {
-      double currentValue = std::abs(matrix[i][col]);
+      double currentValue = std::abs(matrix[i * n + col]);
       if (currentValue > maxValue) {
         maxValue = currentValue;
         maxRowIdx = i;
       }
     }
-    if (maxValue < std::numeric_limits<double>::epsilon()) continue;
+    if (maxValue < 1e-10) continue;
 
     if (maxRowIdx != row) {
       for (size_t j = 0; j < colCount; ++j) {
-        double temp = matrix[row][j];
-        matrix[row][j] = matrix[maxRowIdx][j];
-        matrix[maxRowIdx][j] = temp;
+        double temp = matrix[row * n + j];
+        matrix[row * n + j] = matrix[maxRowIdx * n + j];
+        matrix[maxRowIdx * n + j] = temp;
       }
     }
 
-    double leadElement = matrix[row][col];
+    double leadElement = matrix[row * n + col];
+    if (std::abs(leadElement) < 1e-10) {
+      continue;
+    }
     for (size_t j = col; j < colCount; ++j) {
-      matrix[row][j] /= leadElement;
+      matrix[row * n + j] /= leadElement;
     }
 
     for (size_t i = 0; i < rowCount; ++i) {
       if (i != row) {
-        double factor = matrix[i][col];
+        double factor = matrix[i * n + col];
         for (size_t j = col; j < colCount; ++j) {
-          matrix[i][j] -= factor * matrix[row][j];
+          matrix[i * n + j] -= factor * matrix[row * n + j];
         }
       }
     }
     ++rank;
     ++row;
+    if (rank == n) {
+      break;
+    }
   }
   return rank;
+}
+
+bool opolin_d_simple_iteration_method_mpi::isDiagonalDominance(std::vector<double> mat, size_t dim){
+  for (size_t i = 0; i < dim; i++) {
+    double diagonal_value = std::abs(mat[i * dim + i]);
+    double row_sum = 0.0;
+
+    for (size_t j = 0; j < dim; j++) {
+      if (j != i) {
+        row_sum += std::abs(mat[i * dim + j]);
+      }
+    }
+
+    if (diagonal_value <= row_sum) {
+      return false;
+    }
+  }
+  return true;
 }

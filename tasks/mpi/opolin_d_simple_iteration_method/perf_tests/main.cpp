@@ -8,32 +8,29 @@
 #include "core/perf/include/perf.hpp"
 #include "mpi/opolin_d_simple_iteration_method/include/ops_mpi.hpp"
 
-double getRandomDouble(double min, double max) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  return min + (gen() / (static_cast<double>(RAND_MAX)) * (max - min));
-}
+void generateTestData(size_t size, std::vector<double>& X, std::vector<double>& A, std::vector<double>& b) {
+  std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-void generateTestData(int size, std::vector<double> &x, std::vector<double> &A, std::vector<double> &b) {
-  x.resize(size);
-  for (int i = 0; i < size; ++i) {
-    x[i] = getRandomDouble(-1000.0, 1000.0);
+  X.resize(size);
+  for (size_t i = 0; i < size; ++i) {
+    X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
   }
-  A.resize(size * size);
-  for (int i = 0; i < size; ++i) {
-    double rowSum = 0.0;
-    for (int j = 0; j < size; ++j) {
+
+  A.resize(size * size, 0.0);
+  for (size_t i = 0; i < size; ++i) {
+    double sum = 0.0;
+    for (size_t j = 0; j < size; ++j) {
       if (i != j) {
-        A[i * size + j] = getRandomDouble(-500.0, 500.0);
-        rowSum += std::abs(A[i * size + j]);
+        A[i * size + j] = -1.0 + static_cast<double>(std::rand() % 1000) / 500.0;
+        sum += std::abs(A[i * size + j]);
       }
     }
-    A[i * size + i] = rowSum + getRandomDouble(1.0, 10.0);
+    A[i * size + i] = sum + 1.0;
   }
   b.resize(size, 0.0);
-  for (int i = 0; i < size; ++i) {
-    for (int j = 0; j < size; ++j) {
-      b[i] += A[i * size + j] * x[j];
+  for (size_t i = 0; i < size; ++i) {
+    for (size_t j = 0; j < size; ++j) {
+      b[i] += A[i * size + j] * X[j];
     }
   }
 }
@@ -49,8 +46,8 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   if (world.rank() == 0) {
     // Create data
     generateTestData(size, X, A, b);
-    double epsilon = 1e-5;
-    int maxIters = 1000;
+    double epsilon = 1e-7;
+    int maxIters = 10000;
     std::vector<double> out(size, 0.0);
     // Create TaskData
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
@@ -95,8 +92,8 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   if (world.rank() == 0) {
     // Create data
     generateTestData(size, X, A, b);
-    double epsilon = 1e-5;
-    int maxIters = 1000;
+    double epsilon = 1e-7;
+    int maxIters = 10000;
     std::vector<double> out(size, 0.0);
 
     // Create TaskData

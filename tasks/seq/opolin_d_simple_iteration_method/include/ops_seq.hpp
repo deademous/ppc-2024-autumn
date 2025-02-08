@@ -8,7 +8,8 @@
 
 namespace opolin_d_simple_iteration_method_seq {
 
-int rank(std::vector<std::vector<double>> matrix);
+size_t rank(std::vector<double> matrix, size_t n);
+bool isDiagonalDominance(std::vector<double> mat, size_t dim);
 
 class TestTaskSequential : public ppc::core::Task {
  public:
@@ -19,12 +20,12 @@ class TestTaskSequential : public ppc::core::Task {
   bool post_processing() override;
 
  private:
-  std::vector<std::vector<double>> A_;
+  std::vector<double> A_;
   std::vector<double> C_;
   std::vector<double> b_;
   std::vector<double> d_;
-  std::vector<double> Xold;
-  std::vector<double> Xnew;
+  std::vector<double> Xold_;
+  std::vector<double> Xnew_;
   double epsilon_;
   uint32_t n_;
   int max_iter_;
