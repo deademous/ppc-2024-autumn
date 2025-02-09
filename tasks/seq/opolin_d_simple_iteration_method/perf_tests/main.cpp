@@ -2,8 +2,8 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
-#include <utility>
 #include <random>
+#include <utility>
 
 #include "core/perf/include/perf.hpp"
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
