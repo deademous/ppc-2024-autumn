@@ -1,4 +1,4 @@
-// Copyright 2024 Nesterov Alexander
+// Copyright 2023 Nesterov Alexander
 #pragma once
 
 #include <gtest/gtest.h>
@@ -13,11 +13,9 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
+#include "mpi/malyshev_a_simple_iteration_method/include/matrix.hpp"
 
-namespace opolin_d_simple_iteration_method_mpi {
-
-size_t rank(std::vector<double> matrix, size_t n);
-bool isDiagonalDominance(std::vector<double> mat, size_t dim);
+namespace malyshev_a_simple_iteration_method_mpi {
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
@@ -30,13 +28,12 @@ class TestMPITaskSequential : public ppc::core::Task {
  private:
   std::vector<double> A_;
   std::vector<double> C_;
-  std::vector<double> b_;
-  std::vector<double> d_;
-  std::vector<double> Xold_;
-  std::vector<double> Xnew_;
+  std::vector<double> B_;
+  std::vector<double> D_;
+  std::vector<double> X_;
+  std::vector<double> X0_;
+  double eps_;
   uint32_t n_;
-  double epsilon_;
-  int max_iters_;
 };
 
 class TestMPITaskParallel : public ppc::core::Task {
@@ -50,14 +47,14 @@ class TestMPITaskParallel : public ppc::core::Task {
  private:
   std::vector<double> A_;
   std::vector<double> C_;
-  std::vector<double> b_;
-  std::vector<double> d_;
-  std::vector<double> Xold_;
-  std::vector<double> Xnew_;
+  std::vector<double> B_;
+  std::vector<double> D_;
+  std::vector<double> X_;
+  std::vector<double> X0_;
+  double eps_;
   uint32_t n_;
-  double epsilon_;
-  int max_iters_;
+
   boost::mpi::communicator world;
 };
 
-}  // namespace opolin_d_simple_iteration_method_mpi
+}  // namespace malyshev_a_simple_iteration_method_mpi
