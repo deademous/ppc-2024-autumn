@@ -4,6 +4,7 @@
 #include <climits>
 #include <cmath>
 #include <random>
+#include <vector>
 
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
 

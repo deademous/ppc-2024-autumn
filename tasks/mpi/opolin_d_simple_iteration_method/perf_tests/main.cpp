@@ -3,6 +3,7 @@
 
 #include <boost/mpi/timer.hpp>
 #include <random>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "mpi/opolin_d_simple_iteration_method/include/ops_mpi.hpp"
@@ -59,9 +60,9 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   }
   auto testMpiTaskParallel = std::make_shared<opolin_d_simple_iteration_method_mpi::TestMPITaskParallel>(taskDataPar);
   ASSERT_EQ(testMpiTaskParallel->validation(), true);
-  testMpiTaskParallel->pre_processing();
-  testMpiTaskParallel->run();
-  testMpiTaskParallel->post_processing();
+  ASSERT_EQ(testMpiTaskParallel->pre_processing(), true);
+  ASSERT_EQ(testMpiTaskParallel->run(), true);
+  ASSERT_EQ(testMpiTaskParallel->post_processing(), true);
 
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
