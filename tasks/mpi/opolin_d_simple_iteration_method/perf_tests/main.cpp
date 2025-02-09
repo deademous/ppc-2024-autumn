@@ -6,38 +6,36 @@
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
-#include "mpi/opolin_d_cg_method/include/ops_mpi.hpp"
+#include "mpi/opolin_d_simple_iteration_method/include/ops_mpi.hpp"
 
-void genDataCGMethod(size_t size, std::vector<double>& A, std::vector<double>& b, std::vector<double>& expectedX) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::normal_distribution<> dist(-5.0 , 5.0);
+void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
+  std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-  std::vector<double> M(size * size);
-  for (int i = 0; i < size; i++)
-    for (int j = 0; j < size; j++)
-      M[i * size + j] = dist(gen);
+  X.resize(size);
+  for (size_t i = 0; i < size; ++i) {
+    X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
+  }
 
-  A.assign(size * size, 0.0);
-  for (int i = 0; i < size; i++)
-    for (int j = 0; j < size; j++)
-      for (int k = 0; k < size; k++)
-        A[i * size + j] += M[k * size + i] * M[k * size + j];
-    
-  for (int i = 0; i < size; i++)
-    A[i * size + i] += size;
-
-  expectedX.resize(size);
-  for (int i = 0; i < size; i++)
-    expectedX[i] = dist(gen);
-
-  b.assign(size, 0.0);
-  for (int i = 0; i < size; i++)
-    for (int j = 0; j < size; j++)
-      b[i] += A[i * size + j] * expectedX[j];
+  A.resize(size * size, 0.0);
+  for (size_t i = 0; i < size; ++i) {
+    double sum = 0.0;
+    for (size_t j = 0; j < size; ++j) {
+      if (i != j) {
+        A[i * size + j] = -1.0 + static_cast<double>(std::rand() % 1000) / 500.0;
+        sum += std::abs(A[i * size + j]);
+      }
+    }
+    A[i * size + i] = sum + 1.0;
+  }
+  b.resize(size, 0.0);
+  for (size_t i = 0; i < size; ++i) {
+    for (size_t j = 0; j < size; ++j) {
+      b[i] += A[i * size + j] * X[j];
+    }
+  }
 }
 
-TEST(opolin_d_cg_method_mpi, test_pipeline_run) {
+TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
   int size = 500;
@@ -47,18 +45,20 @@ TEST(opolin_d_cg_method_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     // Create data
-    generateTestData(size, A, b, X);
+    generateTestData(size, X, A, b);
     double epsilon = 1e-7;
+    int maxIters = 10000;
     std::vector<double> out(size, 0.0);
     // Create TaskData
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
     taskDataPar->inputs_count.emplace_back(out.size());
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     taskDataPar->outputs_count.emplace_back(out.size());
   }
-  auto testMpiTaskParallel = std::make_shared<opolin_d_cg_method_mpi::TestMPITaskParallel>(taskDataPar);
+  auto testMpiTaskParallel = std::make_shared<opolin_d_simple_iteration_method_mpi::TestMPITaskParallel>(taskDataPar);
   ASSERT_EQ(testMpiTaskParallel->validation(), true);
   testMpiTaskParallel->pre_processing();
   testMpiTaskParallel->run();
@@ -81,7 +81,7 @@ TEST(opolin_d_cg_method_mpi, test_pipeline_run) {
   }
 }
 
-TEST(opolin_d_cg_method_mpi, test_task_run) {
+TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
@@ -91,8 +91,9 @@ TEST(opolin_d_cg_method_mpi, test_task_run) {
   std::vector<double> X;
   if (world.rank() == 0) {
     // Create data
-    generateTestData(size, A, b, X);
+    generateTestData(size, X, A, b);
     double epsilon = 1e-7;
+    int maxIters = 10000;
     std::vector<double> out(size, 0.0);
 
     // Create TaskData
@@ -100,11 +101,12 @@ TEST(opolin_d_cg_method_mpi, test_task_run) {
     taskDataPar->inputs_count.emplace_back(out.size());
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     taskDataPar->outputs_count.emplace_back(out.size());
   }
 
-  auto testMpiTaskParallel = std::make_shared<opolin_d_cg_method_mpi::TestMPITaskParallel>(taskDataPar);
+  auto testMpiTaskParallel = std::make_shared<opolin_d_simple_iteration_method_mpi::TestMPITaskParallel>(taskDataPar);
   ASSERT_EQ(testMpiTaskParallel->validation(), true);
   testMpiTaskParallel->pre_processing();
   testMpiTaskParallel->run();
