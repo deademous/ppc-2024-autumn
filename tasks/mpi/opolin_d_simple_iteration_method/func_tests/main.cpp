@@ -1,9 +1,10 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
 #include <climits>
 #include <random>
-#include <vector>
 
 #include "mpi/opolin_d_simple_iteration_method/include/ops_mpi.hpp"
 

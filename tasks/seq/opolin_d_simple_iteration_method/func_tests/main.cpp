@@ -1,9 +1,10 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <cmath>
 #include <climits>
 #include <random>
-#include <vector>
+
 
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
 
@@ -38,6 +39,8 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   std::random_device dev;
   std::mt19937 gen(dev());
   int size = 3;
+  double epsilon = 1e-9;
+  int maxIters = 1000;
   std::vector<double> expectedX, A, b;
   generateTestData(size, expectedX, A, b);
 
@@ -47,8 +50,6 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
   taskDataSeq->inputs_count.emplace_back(out.size());
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
-  double epsilon = 1e-9;
-  int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));

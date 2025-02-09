@@ -1,8 +1,9 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <cmath>
+#include <utility>
 #include <random>
-#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
@@ -55,7 +56,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
 
   // Create Task
   auto testTaskSequential = std::make_shared<opolin_d_simple_iteration_method_seq::TestTaskSequential>(taskDataSeq);
-
+  ASSERT_TRUE(testTaskSequential->validation());
+  ASSERT_TRUE(testTaskSequential->pre_processing());
+  ASSERT_TRUE(testTaskSequential->run());
+  ASSERT_TRUE(testTaskSequential->post_processing());
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -73,6 +77,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
   perfAnalyzer->pipeline_run(perfAttr, perfResults);
   ppc::core::Perf::print_perf_statistic(perfResults);
+  ASSERT_EQ(size, out.size());
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
@@ -98,7 +103,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
 
   // Create Task
   auto testTaskSequential = std::make_shared<opolin_d_simple_iteration_method_seq::TestTaskSequential>(taskDataSeq);
-
+  ASSERT_TRUE(testTaskSequential->validation());
+  ASSERT_TRUE(testTaskSequential->pre_processing());
+  ASSERT_TRUE(testTaskSequential->run());
+  ASSERT_TRUE(testTaskSequential->post_processing());
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -116,4 +124,5 @@ TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
   perfAnalyzer->task_run(perfAttr, perfResults);
   ppc::core::Perf::print_perf_statistic(perfResults);
+  ASSERT_EQ(size, out.size());
 }

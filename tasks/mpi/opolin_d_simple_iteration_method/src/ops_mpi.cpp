@@ -1,6 +1,7 @@
 // Copyright 2024 Nesterov Alexander
 #include "mpi/opolin_d_simple_iteration_method/include/ops_mpi.hpp"
 
+#include <boost/mpi.hpp>
 #include <climits>
 #include <random>
 #include <utility>
