@@ -35,10 +35,11 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
 }
 
 TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
-  boost::mpi::communicator world;
   int size = 5;
   double epsilon = 1e-8;
   int maxIters = 10000;
+
+  boost::mpi::communicator world;
 
   std::vector<double> x_ref, A, b;
   generateTestData(size, x_ref, A, b);

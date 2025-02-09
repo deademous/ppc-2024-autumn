@@ -48,7 +48,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   taskDataSeq->inputs_count.emplace_back(out.size());
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   double epsilon = 1e-9;
-  int maxIters = 10000;
+  int maxIters = 1000;
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));

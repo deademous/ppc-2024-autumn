@@ -52,8 +52,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   taskDataSeq->outputs_count.emplace_back(out.size());
+
   // Create Task
   auto testTaskSequential = std::make_shared<opolin_d_simple_iteration_method_seq::TestTaskSequential>(taskDataSeq);
+
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -63,8 +65,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
+
   // Create and init perf results
   auto perfResults = std::make_shared<ppc::core::PerfResults>();
+
   // Create Perf analyzer
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
   perfAnalyzer->pipeline_run(perfAttr, perfResults);
@@ -77,9 +81,11 @@ TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
   std::vector<double> b;
   std::vector<double> X;
   generateTestData(size, X, A, b);
+
   std::vector<double> out(size, 0);
   double epsilon = 1e-7;
   int maxIters = 10000;
+
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
@@ -89,8 +95,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
   taskDataSeq->inputs_count.emplace_back(out.size());
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   taskDataSeq->outputs_count.emplace_back(out.size());
+
   // Create Task
   auto testTaskSequential = std::make_shared<opolin_d_simple_iteration_method_seq::TestTaskSequential>(taskDataSeq);
+
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -100,8 +108,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
+
   // Create and init perf results
   auto perfResults = std::make_shared<ppc::core::PerfResults>();
+
   // Create Perf analyzer
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
   perfAnalyzer->task_run(perfAttr, perfResults);
