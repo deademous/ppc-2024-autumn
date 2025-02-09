@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 #include <climits>
-#include <cmath>
 #include <random>
 #include <vector>
 

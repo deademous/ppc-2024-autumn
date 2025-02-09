@@ -1,9 +1,7 @@
 // Copyright 2024 Nesterov Alexander
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
 
-#include <climits>
 #include <cmath>
-#include <random>
 #include <utility>
 
 using namespace std::chrono_literals;
