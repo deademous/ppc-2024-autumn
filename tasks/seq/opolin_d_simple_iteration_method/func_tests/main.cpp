@@ -38,7 +38,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
 TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   std::random_device dev;
   std::mt19937 gen(dev());
-  int maxIters = 1000;
+  int size = 3;
   std::vector<double> expectedX, A, b;
   generateTestData(size, expectedX, A, b);
 

@@ -1,7 +1,9 @@
 // Copyright 2024 Nesterov Alexander
 #pragma once
+
 #include <string>
 #include <vector>
+
 #include "core/task/include/task.hpp"
 
 namespace opolin_d_simple_iteration_method_seq {
